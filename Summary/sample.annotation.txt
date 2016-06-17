@@ -1,0 +1,13 @@
+sample_id	Condition	Donor
+R1	Mock_NT	1
+R2	Mock+CpG	1
+R3	Scr_NT	1
+R4	Scr+CpG	1
+R5	IRF5KD_NT	1
+R6	IRF5KD+CpG	1
+R7	Mock_NT	2
+R8	Mock+CpG	2
+R9	Scr_NT	2
+R10	Scr+CpG	2
+R11	IRF5KD_NT	2
+R12	IRF5KD+CpG	2

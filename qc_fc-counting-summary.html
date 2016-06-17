@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+</head>
+<div id='canvas1' style='width:100%'>
+  <svg style='height:540px' />
+</div>
+<div id="dataset" style="display:none;">
+[
+	{
+	 "key":"Gene",
+	 "values":[[0,27333718,"R1"],[1,27571879,"R2"],[2,27459334,"R3"],[3,27027553,"R4"],[4,21674325,"R5"],[5,27433324,"R6"],[6,25225972,"R7"],[7,31791949,"R8"],[8,26694695,"R9"],[9,32039323,"R10"],[10,25435401,"R11"],[11,28214641,"R12"]]
+	},
+	{
+	 "key":"Ambiguity",
+	 "values":[[0,1617883],[1,1608694],[2,1577208],[3,1587155],[4,1275116],[5,1639336],[6,1403235],[7,1817559],[8,1472095],[9,1829592],[10,1434052],[11,1601168]]
+	},
+	{
+	 "key":"No_Feature",
+	 "values":[[0,5109106],[1,4264209],[2,5551358],[3,4177760],[4,3557600],[5,3911978],[6,5632295],[7,4735623],[8,6389448],[9,5141583],[10,4860550],[11,4251614]]
+	}
+]
+</div>
+
+<script type="text/javascript">
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+nv.addGraph(function() {
+	var chart = nv.models.stackedAreaChart()
+		.x(function(d) {
+			return d[0]
+		}) //We can modify the data accessor functions...
+		.y(function(d) {
+			return d[1]
+		}) //...in case your data is formatted differently.
+		.useInteractiveGuideline(true) //Tooltips which show all data points. Very nice!
+		.duration(300)
+		.controlLabels({
+			stacked: "Stacked"
+		});
+
+
+	chart.xAxis
+		.tickFormat(function(d) {
+			if (!data[0].values[d]) {
+				return d;
+			} else {
+				return data[0].values[d][2];
+			}
+		});
+
+	chart.yAxis
+		.tickFormat(d3.format(',.3s'));
+
+	d3.select('#canvas1 svg')
+		.datum(data)
+		.call(chart);
+
+	nv.utils.windowResize(chart.update);
+
+	return chart;
+});
+
+</script>
+</body>
+</html>

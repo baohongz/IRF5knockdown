@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+    <style>
+        text {
+            font: 12px sans-serif;
+        }
+        svg {
+            display: block;
+        }
+        html, body, #canvas1, svg {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<div id="canvas1">
+    <svg></svg>
+</div>
+
+<div id="dataset" style="display:none;">
+[
+	{
+	 "key":"RPKM>=0",
+	 "values":[{"x":0,"y":24158,"size":4,"shape":"circle","label":"R1"},{"x":1,"y":23340,"size":4,"shape":"circle","label":"R10"},{"x":2,"y":23592,"size":4,"shape":"circle","label":"R11"},{"x":3,"y":23221,"size":4,"shape":"circle","label":"R12"},{"x":4,"y":23663,"size":4,"shape":"circle","label":"R2"},{"x":5,"y":24212,"size":4,"shape":"circle","label":"R3"},{"x":6,"y":23678,"size":4,"shape":"circle","label":"R4"},{"x":7,"y":23612,"size":4,"shape":"circle","label":"R5"},{"x":8,"y":23803,"size":4,"shape":"circle","label":"R6"},{"x":9,"y":23669,"size":4,"shape":"circle","label":"R7"},{"x":10,"y":23301,"size":4,"shape":"circle","label":"R8"},{"x":11,"y":23799,"size":4,"shape":"circle","label":"R9"}]
+	},
+	{
+	 "key":"RPKM>=0.5",
+	 "values":[{"x":0,"y":15288,"size":4,"shape":"diamond"},{"x":1,"y":13359,"size":4,"shape":"diamond"},{"x":2,"y":14583,"size":4,"shape":"diamond"},{"x":3,"y":13568,"size":4,"shape":"diamond"},{"x":4,"y":14282,"size":4,"shape":"diamond"},{"x":5,"y":15380,"size":4,"shape":"diamond"},{"x":6,"y":14211,"size":4,"shape":"diamond"},{"x":7,"y":14946,"size":4,"shape":"diamond"},{"x":8,"y":14278,"size":4,"shape":"diamond"},{"x":9,"y":14910,"size":4,"shape":"diamond"},{"x":10,"y":13293,"size":4,"shape":"diamond"},{"x":11,"y":15032,"size":4,"shape":"circle"}]
+	},
+	{
+	 "key":"RPKM>=1",
+	 "values":[{"x":0,"y":13094,"size":4,"shape":"square"},{"x":1,"y":11321,"size":4,"shape":"square"},{"x":2,"y":12528,"size":4,"shape":"square"},{"x":3,"y":11645,"size":4,"shape":"square"},{"x":4,"y":12135,"size":4,"shape":"square"},{"x":5,"y":13096,"size":4,"shape":"square"},{"x":6,"y":12097,"size":4,"shape":"square"},{"x":7,"y":12799,"size":4,"shape":"square"},{"x":8,"y":12267,"size":4,"shape":"square"},{"x":9,"y":12828,"size":4,"shape":"square"},{"x":10,"y":11322,"size":4,"shape":"square"},{"x":11,"y":12874,"size":4,"shape":"square"}]
+	},
+	{
+	 "key":"RPKM>=10",
+	 "values":[{"x":0,"y":5076,"size":4,"shape":"cross"},{"x":1,"y":4532,"size":4,"shape":"cross"},{"x":2,"y":5223,"size":4,"shape":"cross"},{"x":3,"y":4855,"size":4,"shape":"cross"},{"x":4,"y":4643,"size":4,"shape":"cross"},{"x":5,"y":5018,"size":4,"shape":"cross"},{"x":6,"y":4665,"size":4,"shape":"cross"},{"x":7,"y":5179,"size":4,"shape":"cross"},{"x":8,"y":5019,"size":4,"shape":"cross"},{"x":9,"y":5032,"size":4,"shape":"cross"},{"x":10,"y":4563,"size":4,"shape":"cross"},{"x":11,"y":5048,"size":4,"shape":"cross"}]
+	}
+]
+</div>
+
+<script>
+
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+        .showDistX(true)
+        .showDistY(true)
+        .useVoronoi(true)
+        .color(d3.scale.category10().range())
+        .duration(300);
+
+    // Baohong: fix the lable display
+    chart.xAxis
+        .tickFormat(function(d) {
+            if (!data[0].values[d]) {
+                return d;
+            } else {
+                return data[0].values[d].label;
+            }
+        });
+
+
+    d3.select('#canvas1 svg')
+        .datum(data)
+        .call(chart);
+    nv.utils.windowResize(chart.update);
+    return chart;
+});
+</script>
+
+</body>
+</html>

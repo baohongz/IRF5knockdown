@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<!-- SlickGrid -->
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/slick.grid.css"/>
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/css/smoothness/jquery-ui-1.11.4.css"/>
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/examples/examples.css"/>
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/controls/slick.pager.css"/>
+<link rel="stylesheet" type="text/css" href="package/d3/d3.parcoords.css">
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="package/jquery.js"></script>
+<script type="text/javascript" src="package/jquery.ui.js"></script>
+<script type="text/javascript" src="package/jquery.ui.sortable.js"></script>
+<script type="text/javascript" src="package/jquery.ui.button.js"></script>
+<script type="text/javascript" src="package/jquery.ui.dialog.js"></script>
+<script type="text/javascript" src="package/d3/d3.min.js"></script>
+<script type="text/javascript" src="package/d3/d3.parcoords.js"></script>
+<script type="text/javascript" src="package/SlickGrid/divgrid.js"></script>
+<script type="text/javascript" src="package/SlickGrid/lib/jquery.event.drag-2.2.js"></script>
+<script type="text/javascript" src="package/SlickGrid/slick.core.js"></script>
+<script type="text/javascript" src="package/SlickGrid/slick.grid.js"></script>
+<script type="text/javascript" src="package/SlickGrid/slick.dataview.js"></script>
+<script type="text/javascript" src="package/SlickGrid/controls/slick.pager.js"></script>
+
+<!-- End SlickGrid -->
+
+
+<style>
+body, html {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  background-color: white;
+}
+body {
+  overflow-y: scroll;
+}
+
+#grid, #pager {
+  width: 100%;
+}
+#grid {
+  bottom: 0;
+  height: 300px;
+}
+#pager {
+  bottom: 306px;
+  height: 20px;
+}
+.slick-row:hover {
+  font-weight: bold;
+  color: #069;
+}
+</style>
+
+</head>
+
+<div id="dataset" style="display:none;">
+Sample	Total_reads	Uniq_Rate	Multi_Rate	Unmap_Rate	Uniq_Mapped_Reads	Gene_Rate	Ambiguity_Rate	No_Feature_Rate	Total_Tags	CDS_Exon	5UTR_Exon	3UTR_Exon	Introns	Intergenic	Counted_Reads	Norm_Factor	Avg_Corr	Corr_diff	MADScore	isOutlier
+R1	43524087	78.26	13.22	8.52	34060708	80.25	4.75	15	42572577	56.41	6.8	24.09	11.1	1.61	27334231	1.0708	0.9646	0.005778	0.41416	N
+R2	42648752	78.42	13.65	7.93	33444783	82.44	4.81	12.75	42276165	57.9	6.47	24.64	9.63	1.37	27572067	0.9515	0.9616	0.002119	-0.04447	N
+R3	44514457	77.7	13.11	9.19	34587901	79.39	4.56	16.05	43211110	56.38	6.96	23.11	11.94	1.61	27460837	1.0697	0.9651	0.006318	0.48174	N
+R4	41609509	78.81	13.32	7.87	32792470	82.42	4.84	12.74	41352056	58.66	6.61	23.8	9.6	1.33	27027299	0.94	0.9622	0.002828	0.04447	N
+R5	34314210	77.26	13.3	9.44	26509694	81.76	4.81	13.42	33778915	58.92	6.69	23.21	9.7	1.48	21674911	1.1355	0.9543	-0.0066	-1.13709	N
+R6	41400550	79.67	12.62	7.71	32984639	83.17	4.97	11.86	41955210	60.86	6.2	22.89	8.83	1.21	27434527	1.0079	0.9676	0.009394	0.86724	N
+R7	39405548	81.86	12.02	6.12	32258277	78.2	4.35	17.46	39760217	55.81	6.71	22.87	12.9	1.71	25224557	1.0473	0.9556	-0.005024	-0.93955	N
+R8	46481525	82.5	12.57	4.93	38345133	82.91	4.74	12.35	48594850	60.5	6.33	22.77	9.14	1.26	31792234	0.8739	0.952	-0.009313	-1.47707	N
+R9	42081074	82.12	11.84	6.04	34556240	77.25	4.26	18.49	42341442	54.85	6.71	22.91	13.77	1.77	26694444	1.0427	0.9555	-0.005142	-0.95443	N
+R10	47368266	82.36	12.56	5.08	39010500	82.13	4.69	13.18	49300474	59.49	6.35	23.04	9.81	1.3	32037871	0.8799	0.9506	-0.011008	-1.6895	N
+R11	39710287	79.9	12.4	7.7	31726832	80.17	4.52	15.32	39724643	57.23	6.52	23.4	11.35	1.49	25434399	1.0635	0.9642	0.005234	0.34589	N
+R12	41676367	81.74	12.08	6.18	34067425	82.82	4.7	12.48	42989998	60.3	6.01	23.11	9.38	1.2	28215628	0.9551	0.9643	0.005416	0.36879	N
+</div>
+
+<div id="canvas1" class="parcoords" style="height:240px;"></div>
+
+<div style="padding:4px;">
+<b>Controls:</b> 
+<b>Brush</b> - Drag vertically along an axis.
+<b>Remove Brush</b> - Tap the axis background.
+<b>Reorder Axes</b> - Drag a label horizontally.
+<b>Invert Axis</b> - Double click on an axis label.
+<b>Remove Axis</b> - Drag axis label off the left or the right edge.
+<b>Tooltip</b> - Click on the line to show values, move out of the canvas to remove tooptip.
+</div>
+
+<hr>
+<div id="dialog_Total_reads" title="Total_reads" style="display:none;">
+  <p>Total number of sequencing reads from raw fastq file</p>
+</div>
+<div id="dialog_Uniq_Rate" title="Uniq_Rate" style="display:none;">
+  <p>Percentage of reads uniquely mapped to the reference genome.</p>
+</div>
+<div id="dialog_Multi_Rate" title="Multi_Rate" style="display:none;">
+  <p>Percentage of reads mapped equally well to multiple locations on the reference genome.</p>
+</div>
+<div id="dialog_Unmap_Rate" title="Unmap_Rate" style="display:none;">
+  <p>Percentage of reads not mapped to the reference genome.</p>
+</div>
+<div id="dialog_Uniq_Mapped_Reads" title="Uniq_Mapped_Reads" style="display:none;">
+  <p>Number of uniquely mapped reads.</p>
+</div>
+<div id="dialog_Gene_Rate" title="Gene_Rate" style="display:none;">
+  <p>Percentage of reads mapped to unique gene region, including Exons, UTRs and Introns.</p>
+</div>
+<div id="dialog_Ambiguity_Rate" title="Ambiguity_Rate" style="display:none;">
+  <p>Percentage of reads mapped to gene-overlapping region and can't be unambiguously assigned to either gene.</p>
+</div>
+<div id="dialog_No_Feature_Rate" title="No_Feature_Rate" style="display:none;">
+  <p>Percentage of reads mapped to unannotated genomic regions.</p>
+</div>
+<div id="dialog_Total_Tags" title="Total_Tags" style="display:none;">
+  <p>Total number of tags (reads, one paired-end read counted as two reads)</p>
+</div>
+<div id="dialog_CDS_Exon" title="CDS_Exon" style="display:none;">
+  <p>Percentage of mapped reads on Exons.</p>
+</div>
+<div id="dialog_5UTR_Exon" title="5UTR_Exon" style="display:none;">
+  <p>Percentage of mapped reads on 5' UTR.</p>
+</div>
+<div id="dialog_3UTR_Exon" title="3UTR_Exon" style="display:none;">
+  <p>Percentage of mapped reads on 3' UTR.</p>
+</div>
+<div id="dialog_Introns" title="Introns" style="display:none;">
+  <p>Percentage of mapped reads on Introns.</p>
+</div>
+<div id="dialog_Intergenic" title="Intergenic" style="display:none;">
+  <p>Percentage of mapped reads on Intergenic regions.</p>
+</div>
+<div id="dialog_Counted_Reads" title="Counted_Reads" style="display:none;">
+  <p>Reads counted by featureCounts (=uniquely mapped read  * uniq_rate)</p>
+</div>
+<div id="dialog_Norm_Factor" title="Norm_Factor" style="display:none;">
+  <p>Normalization factor calculated by edgeR</p>
+</div>
+<div id="dialog_Avg_Corr" title="Avg_Corr" style="display:none;">
+  <p>Average correlation where this sample is involved</p>
+</div>
+<div id="dialog_Corr_diff" title="Corr_diff" style="display:none;">
+  <p>
+Avg_Corr : Average correlation where this sample is involved; <br><br>
+Avg_Rest : Average correlation where this sample is NOT involved; <br><br>
+Corr_diff : The difference between Avg_Corr and Avg_Rest.</p>
+</div>
+<div id="dialog_MADScore" title="MADScore" style="display:none;">
+  <p>
+(1) For each sample, calculate the correlation difference. This is simply a difference between the average of all the pair wise correlations that involve the sample (for the same group) and the average of all the pair wise correlations that do not involve the sample. For example, if we have a, b, c, d for group 1, the correlation difference of sample a is:<br><br>
+The difference of Average (correlation(a, b), correlation(a, c), correlation(a, d)) and Average (correlation(b, c), correlation (b, d), correlation(c, d)). You can see that if sample a is an outlier, then the difference will be negative.<br><br>
+(2) Now we have a vector of values (one for each sample). We simply convert this vector to MAD scores (robust Z-scores) by subtracting the medians then dividing it by median absolute deviations (MAD). We use a standard MAD cutoff (e.g. -5) to determine the outliers.</p>
+</div>
+
+<table border=0>
+<tr><td>
+Search: <input type="text" id="txtSearch" value="">
+</td><td>Right click on a column to show the explanation.</td></tr>
+</table>
+
+<div id="grid"></div>
+<div id="pager"></div>
+
+
+<script type="text/javascript">
+
+var color_set = d3.scale.linear().range(["#3182bd", "#f33"]);
+
+var parcoords = d3.parcoords()("#canvas1")
+	.alpha(0.4)
+	.mode("queue") // progressive rendering
+	.height(240)
+	.margin({
+		top: 36,
+		left: 0,
+		right: 0,
+		bottom: 16
+	});
+
+// load tsv file and create the chart
+
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');
+var data = d3.tsv.parse(dataset);
+
+
+data.forEach(function(d, i) {
+	d.id = d.id || i;
+});
+
+parcoords
+	.data(data)
+	.hideAxis(["id", "Avg_Corr", "Corr_diff"])
+	.render()
+	.margin({
+		top: 40,
+		right: 20,
+		bottom: 20,
+		left: 50
+	})
+	.reorderable()
+	.brushMode("1D-axes");
+
+// setting up grid
+var column_keys = d3.keys(data[0]);
+var columns = column_keys.map(function(key, i) {
+	return {
+		id: key,
+		name: key,
+		field: key,
+		sortable: true
+	}
+});
+
+
+// update_colors(d3.keys(data[0])[2]);
+
+// click label to activate coloring
+//parcoords.svg.selectAll(".dimension")
+//	.on("click", update_colors)
+//	.selectAll(".label")
+//		.style("font-size", "10px"); // change font sizes of selected lable
+//
+//
+//add hover event
+d3.select("#canvas1 svg")
+	.on("click", function() {
+		var mousePosition = d3.mouse(this);
+		highlightLineOnClick(mousePosition, true); //true will also add tooltip
+	})
+	.on("mouseout", function() {
+		cleanTooltip();
+		parcoords.unhighlight();
+	});
+
+
+// update color and font weight of chart based on axis selection
+// modified from here: https://syntagmatic.github.io/parallel-coordinates/
+function update_colors(dimension) {
+	// change the fonts to bold
+	parcoords.svg.selectAll(".dimension")
+		.style("font-weight", "normal")
+		.filter(function(d) {
+			return d == dimension;
+		})
+		.style("font-weight", "bold");
+
+	// change color of lines
+	// set domain of color scale
+	var values = parcoords.data().map(function(d) {
+		return parseFloat(d[dimension])
+	});
+	color_set.domain([d3.min(values), d3.max(values)]);
+
+	// change colors for each line
+	parcoords.color(function(d) {
+		return color_set([d[dimension]])
+	}).render();
+};
+
+
+// Add highlight for every line on click
+function getCentroids(data) {
+	// this function returns centroid points for data. I had to change the source
+	// for parallelcoordinates and make compute_centroids public.
+	// I assume this should be already somewhere in graph and I don't need to recalculate it
+	// but I couldn't find it so I just wrote this for now
+	var margins = parcoords.margin();
+	var graphCentPts = [];
+
+	data.forEach(function(d) {
+
+		var initCenPts = parcoords.compute_centroids(d).filter(function(d, i) {
+			return i % 2 == 0;
+		});
+
+		// move points based on margins
+		var cenPts = initCenPts.map(function(d) {
+			return [d[0] + margins["left"], d[1] + margins["top"]];
+		});
+
+		graphCentPts.push(cenPts);
+	});
+
+	return graphCentPts;
+}
+
+function getActiveData() {
+	// I'm pretty sure this data is already somewhere in graph
+	if (parcoords.brushed() != false) return parcoords.brushed();
+	return parcoords.data();
+}
+
+function isOnLine(startPt, endPt, testPt, tol) {
+	// check if test point is close enough to a line
+	// between startPt and endPt. close enough means smaller than tolerance
+	var x0 = testPt[0];
+	var y0 = testPt[1];
+	var x1 = startPt[0];
+	var y1 = startPt[1];
+	var x2 = endPt[0];
+	var y2 = endPt[1];
+	var Dx = x2 - x1;
+	var Dy = y2 - y1;
+	var delta = Math.abs(Dy * x0 - Dx * y0 - x1 * y2 + x2 * y1) / Math.sqrt(Math.pow(Dx, 2) + Math.pow(Dy, 2));
+	//console.log(delta);
+	if (delta <= tol) return true;
+	return false;
+}
+
+function findAxes(testPt, cenPts) {
+	// finds between which two axis the mouse is
+	var x = testPt[0];
+	var y = testPt[1];
+
+	// make sure it is inside the range of x
+	if (cenPts[0][0] > x) return false;
+	if (cenPts[cenPts.length - 1][0] < x) return false;
+
+	// find between which segment the point is
+	for (var i = 0; i < cenPts.length; i++) {
+		if (cenPts[i][0] > x) return i;
+	}
+}
+
+function cleanTooltip() {
+	// removes any object under #tooltip is
+	parcoords.svg.selectAll("#tooltip")
+		.remove();
+}
+
+function addTooltip(clicked, clickedCenPts) {
+
+	// add tooltip to multiple clicked lines
+	var clickedDataSet = [];
+	var margins = parcoords.margin();
+	var dim = parcoords.dimensions();
+
+	// get all the values into a single list
+	// I'm pretty sure there is a better way to write this is Javascript
+	for (var i = 0; i < clicked.length; i++) {
+//console.log(clicked[i]);
+		for (var j = 0; j < clickedCenPts[i].length; j++) {
+// Baohong: fix the bug here, should match displaying axis
+//			var text = d3.values(clicked[i])[j];
+			var text = String(clicked[i][dim[j]]); // It must be String type
+			// not clean at all!
+			var x = clickedCenPts[i][j][0] - margins.left;
+			var y = clickedCenPts[i][j][1] - margins.top;
+			clickedDataSet.push([x, y, text]);
+		}
+	};
+
+
+	// add rectangles
+	var fontSize = 14;
+	var padding = 2;
+	var rectHeight = fontSize + 2 * padding; //based on font size
+
+	parcoords.svg.selectAll("rect[id='tooltip']")
+		.data(clickedDataSet).enter()
+		.append("rect")
+		.attr("x", function(d) {
+			return d[0] - d[2].length * 5;
+		})
+		.attr("y", function(d) {
+			return d[1] - rectHeight + 2 * padding;
+		})
+		.attr("rx", "2")
+		.attr("ry", "2")
+		.attr("id", "tooltip")
+		.attr("fill", "grey")
+		.attr("opacity", 0.9)
+		.attr("width", function(d) {
+			return d[2].length * 10;
+		})
+		.attr("height", rectHeight);
+
+	// add text on top of rectangle
+	parcoords.svg.selectAll("text[id='tooltip']")
+		.data(clickedDataSet).enter()
+		.append("text")
+		.attr("x", function(d) {
+			return d[0];
+		})
+		.attr("y", function(d) {
+			return d[1];
+		})
+		.attr("id", "tooltip")
+		.attr("fill", "white")
+		.attr("text-anchor", "middle")
+		.attr("font-size", fontSize)
+		.text(function(d) {
+			return d[2];
+		})
+}
+
+function getClickedLines(mouseClick) {
+	var clicked = [];
+	var clickedCenPts = [];
+
+	// find which data is activated right now
+	var activeData = getActiveData();
+
+	// find centriod points
+	var graphCentPts = getCentroids(activeData);
+
+	if (graphCentPts.length == 0) return false;
+
+	// find between which axes the point is
+	var axeNum = findAxes(mouseClick, graphCentPts[0]);
+	if (!axeNum) return false;
+
+	graphCentPts.forEach(function(d, i) {
+		if (isOnLine(d[axeNum - 1], d[axeNum], mouseClick, 2)) {
+			clicked.push(activeData[i]);
+			clickedCenPts.push(graphCentPts[i]); // for tooltip
+		}
+	});
+
+	return [clicked, clickedCenPts]
+}
+
+
+function highlightLineOnClick(mouseClick, drawTooltip) {
+
+	var clicked = [];
+	var clickedCenPts = [];
+
+	clickedData = getClickedLines(mouseClick);
+
+	if (clickedData && clickedData[0].length != 0) {
+
+		clicked = clickedData[0];
+		clickedCenPts = clickedData[1];
+
+		// highlight clicked line
+		parcoords.highlight(clicked);
+
+		if (drawTooltip) {
+			// clean if anything is there
+			cleanTooltip();
+			// add tooltip
+			addTooltip(clicked, clickedCenPts);
+		}
+
+	}
+}
+
+
+// SlickGrid
+var options = {
+	enableCellNavigation: true,
+	multiColumnSort: false
+};
+columns[0] = {
+	id: "Sample",
+	name: "Sample",
+	field: "Sample",
+	formatter: linkFormatter = function(row, cell, value, columnDef, dataContext) {
+		return '<a href=QC/' + value + '/' + value + '.qc.html target=_blank>' + value + '</a>';
+	}
+};
+
+var dataView = new Slick.Data.DataView();
+var grid = new Slick.Grid("#grid", dataView, columns, options);
+var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
+
+// wire up model events to drive the grid
+dataView.onRowCountChanged.subscribe(function(e, args) {
+	grid.updateRowCount();
+	grid.render();
+});
+
+dataView.onRowsChanged.subscribe(function(e, args) {
+	grid.invalidateRows(args.rows);
+	grid.render();
+});
+
+
+// column sorting
+var sortcol = column_keys[0];
+var sortdir = 1;
+
+function comparer(a, b) {
+
+	// Baohong Zhang: fix to sort integer right
+	if (/^[.|d]*
+.test(a[sortcol]) && /^[.|d]*
+.test(b[sortcol])) {
+		a[sortcol] = parseFloat(a[sortcol], 10);
+		b[sortcol] = parseFloat(b[sortcol], 10);
+	}
+
+	var x = a[sortcol],
+		y = b[sortcol];
+	return (x == y ? 0 : (x > y ? 1 : -1));
+}
+
+// click header to sort grid column
+grid.onSort.subscribe(function(e, args) {
+	sortdir = args.sortAsc ? 1 : -1;
+	sortcol = args.sortCol.field;
+
+	dataView.sort(comparer, args.sortAsc);
+});
+
+// highlight row in chart
+// Baohong: Added Tooltip
+grid.onMouseEnter.subscribe(function(e, args) {
+//	var d = parcoords.brushed() || data;
+	var r = grid.getCellFromEvent(e).row;
+	var i = dataView.getIdxById(grid.getDataItem(r)["id"])  // sorting will change data order
+
+	var d = data;
+	parcoords.highlight([d[i]]);
+	// clean if anything is there
+	cleanTooltip();
+	// add tooltip
+	addTooltip([d[i]], getCentroids([d[i]]));
+});
+
+grid.onMouseLeave.subscribe(function(e, args) {
+	parcoords.unhighlight();
+	cleanTooltip();
+});
+
+grid.onHeaderContextMenu.subscribe(function(e, args) {
+	e.preventDefault();
+	var theDialog = $("#dialog_"+args.column.id).dialog();
+	theDialog.dialog("option", "position", [e.pageX,e.pageY]);
+	theDialog.dialog("open");
+});
+
+grid.onClick.subscribe(function(e, args) {
+
+	// args.row - row of the clicked cell
+	// args.cell - column of the clicked cell
+});
+
+
+// update grid on brush
+parcoords.on("brush", function(d) {
+	gridUpdate(d);
+});
+
+
+var searchString = "";
+
+function myFilter(data, args) {
+	if (args.searchString != "" && data[columns[0].name].toUpperCase().indexOf(args.searchString.toUpperCase()) == -1 &&
+		data[columns[1].name].toUpperCase().indexOf(args.searchString.toUpperCase()) == -1 &&
+		data[columns[2].name].toUpperCase().indexOf(args.searchString.toUpperCase()) == -1 &&
+		data[columns[3].name].toUpperCase().indexOf(args.searchString.toUpperCase()) == -1) {
+		return false;
+	}
+	return true;
+}
+
+$("#txtSearch").keyup(function(e) {
+	Slick.GlobalEditorLock.cancelCurrentEdit();
+
+	// clear on Esc
+	if (e.which == 27) {
+		this.value = "";
+	}
+
+	searchString = this.value;
+	updateFilter();
+});
+
+function updateFilter() {
+	dataView.setFilterArgs({
+		searchString: searchString
+	});
+	dataView.refresh();
+}
+
+function gridUpdate(data) {
+	dataView.beginUpdate();
+	dataView.setItems(data);
+
+	dataView.setFilterArgs({
+		searchString: searchString
+	});
+
+	dataView.setFilter(myFilter);
+
+	dataView.endUpdate();
+};
+
+// fill grid with data
+gridUpdate(data);
+
+window.onload = function() {
+	if(!window.location.hash) {
+		window.location = window.location + '#loaded';
+		window.location.reload();
+	}
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+</head>
+<div id='canvas1' style='width:100%'>
+  <svg style='height:540px' />
+</div>
+<div id="dataset" style="display:none;">
+[
+	{
+	 "key":"Uniq",
+	 "values":[[0,34061950,"R1"],[1,33445151,"R2"],[2,34587733,"R3"],[3,32792454,"R4"],[4,26511158,"R5"],[5,32983818,"R6"],[6,32257381,"R7"],[7,38347258,"R8"],[8,34556977,"R9"],[9,39012503,"R10"],[10,31728519,"R11"],[11,34066262,"R12"]]
+	},
+	{
+	 "key":"Multi",
+	 "values":[[0,5753884],[1,5821554],[2,5835845],[3,5542386],[4,4563789],[5,5224749],[6,4736546],[7,5842727],[8,4982399],[9,5949454],[10,4924075],[11,5034505]]
+	},
+	{
+	 "key":"Unmap",
+	 "values":[[0,3708252],[1,3382046],[2,4090878],[3,3274668],[4,3239261],[5,3191982],[6,2411619],[7,2291539],[8,2541696],[9,2406307],[10,3057692],[11,2575599]]
+	}
+]
+</div>
+
+<script type="text/javascript">
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+nv.addGraph(function() {
+	var chart = nv.models.stackedAreaChart()
+		.x(function(d) {
+			return d[0]
+		}) //We can modify the data accessor functions...
+		.y(function(d) {
+			return d[1]
+		}) //...in case your data is formatted differently.
+		.useInteractiveGuideline(true) //Tooltips which show all data points. Very nice!
+		.duration(300)
+		.controlLabels({
+			stacked: "Stacked"
+		});
+
+
+	chart.xAxis
+		.tickFormat(function(d) {
+			if (!data[0].values[d]) {
+				return d;
+			} else {
+				return data[0].values[d][2];
+			}
+		});
+
+	chart.yAxis
+		.tickFormat(d3.format(',.3s'));
+
+	d3.select('#canvas1 svg')
+		.datum(data)
+		.call(chart);
+
+	nv.utils.windowResize(chart.update);
+
+	return chart;
+});
+
+</script>
+</body>
+</html>
